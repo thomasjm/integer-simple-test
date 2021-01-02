@@ -1,5 +1,7 @@
 # integer-simple-test
 
+This is just a clean Stack project created with `stack new` and with one dependency added: `wai-logger`.
+
 ## To reproduce the problem:
 
 ``` bash
