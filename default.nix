@@ -1,12 +1,14 @@
-{ haskellNix ? import (builtins.fetchTarball "https://github.com/input-output-hk/haskell.nix/archive/master.tar.gz") {}
+{ haskellNix ? import /home/tom/tools/haskell.nix {}
 , nixpkgsSrc ? haskellNix.sources.nixpkgs-2003
 , nixpkgsArgs ? haskellNix.nixpkgsArgs
-, pkgs ? import nixpkgsSrc nixpkgsArgs
+, nixpkgs ? import nixpkgsSrc nixpkgsArgs
+, pkgs ? nixpkgs.pkgsCross.musl64
 }: pkgs.haskell-nix.project {
   modules = [{
-    ghc.package = pkgs.buildPackages.haskell-nix.compiler.ghc884.override {
-      enableIntegerSimple = true;
-    };
+    # Workaround for https://github.com/input-output-hk/haskell.nix/issues/985
+    ghc.package =
+      let ghc = pkgs.buildPackages.haskell-nix.compiler.ghc884.override { enableIntegerSimple = true; };
+      in ghc // { passthru = ghc.passthru // { buildGHC = ghc; }; };
     packages.hashable.flags.integer-gmp = false;
   }];
 
